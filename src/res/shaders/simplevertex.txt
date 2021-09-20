@@ -1,0 +1,11 @@
+#version 400 core
+
+in vec3 pos3;
+
+uniform mat4 projectedMat;
+
+void main(void){
+
+    gl_Position =  projectedMat * vec4(pos3, 1.0) ; 	
+
+}

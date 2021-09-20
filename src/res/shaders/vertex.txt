@@ -1,0 +1,34 @@
+#version 400 core
+
+in vec3 pos3;
+in vec2 texCoords;
+in vec3 normal;
+
+out vec2 texCoord0;
+out vec3 normal0;
+out float visibility;
+
+uniform vec3 cameraPosition;
+uniform mat4 worldMat;
+uniform mat4 projectedMat;
+uniform vec2 textureRepeat;
+
+uniform float fogDensity;
+uniform float fogGradient;
+
+void main(void){
+
+    gl_Position = projectedMat * vec4(pos3, 1.0);
+
+    float distance = length(cameraPosition - (worldMat * vec4(pos3,1.0)).xyz);
+    visibility = exp(-pow((distance * fogDensity), fogGradient));
+    visibility = clamp(visibility, 0.0, 1.0);
+ 	
+    texCoord0 = texCoords * textureRepeat;
+
+    normal0 = (worldMat * vec4(normal,0.0)).xyz;
+
+
+
+
+}
