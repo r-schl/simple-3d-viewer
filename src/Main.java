@@ -22,14 +22,14 @@ class Main {
         Store store = new Store();
 
         EventDispatcher eventDispatcher = new EventDispatcher();
-   
-        eventDispatcher.register("window:create", 0, () -> {
+
+        eventDispatcher.register("window:created", 0, () -> {
             store.write((writable) -> {
 
                 // camera
-                writable.putComponent(10, new Camera(90, 0.001f, 1000f));
+                writable.putComponent(10, new Camera(90, 0.1f, 1000f));
                 writable.putComponent(10, new Orientation(FQuaternion.newRotation(0, FVec3.YAXIS)));
-                // writable.putComponent(10, new AutoRotation());
+                writable.putComponent(10, new AutoRotation());
 
                 // environment
                 writable.putComponent(1, new DirectionalLight(new FVec3(0, 0.8f, 0.8f), new FVec3(1), 0.9),
@@ -37,8 +37,8 @@ class Main {
 
                 // object
                 writable.putComponent(24, new TextureLoader().loadPNGFile("src/res/textures/Unbenannt.png"),
-                        new MeshLoader().loadOBJFile("src/res/objects/dragon.obj"), new Position(new FVec3(0, 0, -20)));
-               // writable.putComponent(24, new AutoRotation());
+                        new MeshLoader().loadOBJFile("src/res/objects/dragon.obj"), new Position(new FVec3(0, 0, -10)));
+                // writable.putComponent(24, new AutoRotation());
 
                 writable.putComponent(24, new AutoRotation());
 
@@ -63,7 +63,7 @@ class Main {
         autoRotation.setEventDispatcher(eventDispatcher);
         autoRotation.startOnThread();
 
-        Loop coreSystem = new Loop(60, 60);
+        Core coreSystem = new Core(60, 60);
         coreSystem.setStore(store);
         coreSystem.setEventDispatcher(eventDispatcher);
         coreSystem.startOnThread();
@@ -75,7 +75,7 @@ class Main {
             e.printStackTrace();
         }
 
-        eventDispatcher.trigger("loop:start");
+        eventDispatcher.trigger("window:create");
 
     }
 

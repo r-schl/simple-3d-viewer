@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL;
 
 import ecs.EcsSystem;
 import ecs.components.LoopInformation;
+import ecs.components.Timer;
 import ecs.components.WindowInformation;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -39,17 +40,20 @@ public class Window extends EcsSystem {
         register("window:create", 10, this::onCreateWindow);
         register("update", 10, this::onUpdate);
         register("render", -1, this::onRender);
-        register("stop", 10, this::onStop);
+        register("stop", -1, this::onStop);
         register("clock:1sec", 0, () -> {
             store().read((readable) -> {
                 LoopInformation li = readable.getComponent(0, LoopInformation.class);
-                glfwSetWindowTitle(window, "3D Viewer   [FPS: " + li.getCurrentFPS() + " UPS: " + li.getCurrentUPS() + "]");
+                Timer timer = readable.getComponent(0, Timer.class);
+                glfwSetWindowTitle(window, "3D Viewer   [FPS: " + li.getCurrentFPS() + " UPS: " + li.getCurrentUPS()
+                        + "] " + timer.getTime());
             });
         });
     }
 
     private void onCreateWindow() {
         this.window = createWindow(width, height, title);
+        trigger("window:created");
     }
 
     private void onRender() {
@@ -74,13 +78,13 @@ public class Window extends EcsSystem {
     }
 
     private void onStop() {
+        print("stopped");
         glfwTerminate();
-      //  System.exit(0);
     }
 
     private long createWindow(int width, int height, String title) {
         if (!GLFW.glfwInit()) {
-            new Exception("[GUI] Failed to initialized GLFW").printStackTrace();
+            new Exception("[GUI] Failed to initialize GLFW").printStackTrace();
             System.exit(-1);
         }
         // when created window is not visible

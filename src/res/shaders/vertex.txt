@@ -18,7 +18,7 @@ uniform float fogGradient;
 
 void main(void){
 
-    gl_Position = projectedMat * vec4(pos3, 1.0);
+    gl_Position = projectedMat * vec4(pos3.x, pos3.y, pos3.z, 1.0);
 
     float distance = length(cameraPosition - (worldMat * vec4(pos3,1.0)).xyz);
     visibility = exp(-pow((distance * fogDensity), fogGradient));

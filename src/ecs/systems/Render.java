@@ -108,28 +108,40 @@ public class Render extends EcsSystem {
                 }
 
                 FMat4 translationMatrix = FMat4.newTranslation3(position.getVector()).transpose();
-                FMat4 rotationMatrix = FMat4.newRot3FromQuaternion(orientation.getQuaternion());
-                FMat4 scaleMatrix = FMat4.newScale3(scale.getVector());
+                FMat4 rotationMatrix = FMat4.newRot3FromQuaternion(orientation.getQuaternion()).transpose();
+                FMat4 scaleMatrix = FMat4.newScale3(scale.getVector()).transpose();
 
-                // local model space => world space
-                FMat4 modelToWorldMatrix = new FMat4()
-                        .mul(scaleMatrix)
-                        .mul(rotationMatrix)
-                        .mul(translationMatrix)
-                ;
+                // FMat4 modelToWorldMatrix = new
+                // FMat4().mul(translationMatrix).mul(rotationMatrix).mul(scaleMatrix);
 
-                // local model space => world space => view space => projection space
-                FMat4 modelToProjectionMatrix = new FMat4()
-                        // #1 model space to world space
-                        .mul(modelToWorldMatrix)
+                FMat4 modelToWorldMatrix = new FMat4(translationMatrix)
+                        .premul(new FMat4(rotationMatrix).premul(scaleMatrix));
 
-                        // #2 world space to view space
-                        .mulView3FromQuaternion(cameraPosition.getVector(), cameraOrientation.getQuaternion())
-                        // #3 view space to projection space
-                        .mulPerspective3Fov(windowWidth / (float) windowHeight, camera.getZNear(), camera.getZFar(),
-                                camera.getFOV())
+                FMat4 worldToViewMatrix = FMat4.newView3FromQuaternion(cameraPosition.getVector(), cameraOrientation.getQuaternion()).transpose();
 
-                ;
+               // FMat4 viewToProjectionMatrix = FMat4.newPerspective3Fov(windowWidth / (float) windowHeight,
+                  //      camera.getZNear(), camera.getZFar(), camera.getFOV()).transpose();
+
+                FMat4 viewToProjectionMatrix = FMat4.newPerspective3Fov(windowWidth / (float) windowHeight, camera.getZNear(), camera.getZFar(), camera.getFOV());
+
+                FMat4 modelToProjectionMatrix = new FMat4(viewToProjectionMatrix)
+                        .premul(new FMat4(worldToViewMatrix).mul(modelToWorldMatrix));
+
+                /*
+                 * // local model space => world space => view space => projection space
+                 * FMat4 modelToProjectionMatrix = new FMat4()
+                 * // #3 view space to projection space
+                 * .mulPerspective3Fov(windowWidth / (float) windowHeight, camera.getZNear(),
+                 * camera.getZFar(),
+                 * camera.getFOV())
+                 * // #2 world space to view space
+                 * .mulView3FromQuaternion(cameraPosition.getVector(),
+                 * cameraOrientation.getQuaternion())
+                 * // #1 model space to world space
+                 * .mul(translationMatrix)
+                 * .mul(rotationMatrix)
+                 * .mul(scaleMatrix);
+                 */
 
                 FMat4 textureMatrix = new FMat4(1.0f / texture.getSizeOfAtlas().getX(), 0, 0, 0, 0,
                         1.0f / texture.getSizeOfAtlas().getY(), 0, 0,
@@ -152,6 +164,8 @@ public class Render extends EcsSystem {
                 getShader().setUniform("directionalLight.base.color", directionalLight.getColor());
                 getShader().setUniform("directionalLight.base.intensity", directionalLight.getIntensity());
                 getShader().setUniform("directionalLight.direction", directionalLight.getDirection());
+
+            
 
                 // if a different mesh occurs load new one
                 if (meshReference.getVAO() != currMesh) {

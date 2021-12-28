@@ -104,4 +104,13 @@ public abstract class EcsSystem {
         this.eventDispatcher = eventDispatcher;
     }
 
+    public void print(String text) {
+        Class<?> enclosingClass = getClass().getEnclosingClass();
+        if (enclosingClass != null) {
+            System.out.println("[" + enclosingClass.getName() + "] " + text);
+        } else {
+            System.out.println("[" + getClass().getName() + "] " + text);
+        }
+    }
+
 }
