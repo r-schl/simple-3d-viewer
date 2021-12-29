@@ -15,16 +15,6 @@ public class AutoRotationSystem extends EcsSystem {
     @Override
     public void init() {
         registerOwnThread("update", 0, this::onUpdate);
-        register(TestEvent.class, 0, new Consumer<TestEvent>() {
-
-            @Override
-            public void accept(TestEvent t) {
-                // TODO Auto-generated method stub
-               // System.out.println(t.getTimestamp());
-               // System.out.println(t.getMessage() + " " + Thread.currentThread() + " ");
-            }
-
-        });
     }
 
     private void onUpdate() {

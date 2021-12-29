@@ -1,5 +1,6 @@
 package ecs.systems;
 
+import ecs.Component;
 import ecs.EcsSystem;
 import ecs.components.WindowInformation;
 import render.PhongShader;
@@ -31,13 +32,6 @@ public class Render extends EcsSystem {
         return this.shader;
     }
 
-    AmbientLight defaulAmbientLight = new AmbientLight(new FVec3(1));
-    DirectionalLight defaulDirectionalLight = new DirectionalLight(new FVec3(1), new FVec3(1), 1);
-    Fog defaultFog = new Fog(0, 1, new FVec3(0));
-    Scale defaultScale = new Scale(new FVec3(1));
-    Position defaultPosition = new Position(new FVec3(0));
-    Orientation defaulOrientation = new Orientation(new FQuaternion().initRotation(0, FVec3.YAXIS));
-
     @Override
     public void init() {
         register("render", 9, this::onRender);
@@ -61,26 +55,22 @@ public class Render extends EcsSystem {
             int cameraEntity = entitiesWithCameras[0];
 
             Camera camera = readable.getComponent(cameraEntity, Camera.class);
-            Position cameraPosition = readable.getComponent(cameraEntity, Position.class);
-            if (cameraPosition == null)
-                cameraPosition = defaultPosition;
-            Orientation cameraOrientation = readable.getComponent(cameraEntity, Orientation.class);
-            if (cameraOrientation == null)
-                cameraOrientation = defaulOrientation;
+            Position cameraPosition = readable.getComponentOrStandard(cameraEntity, Position.class);
+            Orientation cameraOrientation = readable.getComponentOrStandard(cameraEntity, Orientation.class);
 
             // Fog
             int[] fogEntities = readable.filterEntities(Fog.class);
-            Fog fog = fogEntities.length > 0 ? readable.getComponent(fogEntities[0], Fog.class) : defaultFog;
+            Fog fog = fogEntities.length > 0 ? readable.getComponent(fogEntities[0], Fog.class) : Fog.standard();
             // Directional light
             int[] directionalLightEntities = readable.filterEntities(DirectionalLight.class);
             DirectionalLight directionalLight = directionalLightEntities.length > 0
                     ? readable.getComponent(directionalLightEntities[0], DirectionalLight.class)
-                    : defaulDirectionalLight;
+                    : DirectionalLight.standard();
             // Ambient Light
             int[] ambientLightEntities = readable.filterEntities(AmbientLight.class);
             AmbientLight ambientLight = ambientLightEntities.length > 0
                     ? readable.getComponent(ambientLightEntities[0], AmbientLight.class)
-                    : defaulAmbientLight;
+                    : AmbientLight.standard();
 
             if (!getShader().isCreated)
                 getShader().create();
@@ -94,62 +84,68 @@ public class Render extends EcsSystem {
 
                 MeshReference meshReference = readable.getComponent(entity, MeshReference.class);
                 TextureReference texture = readable.getComponent(entity, TextureReference.class);
-                Scale scale = readable.getComponent(entity, Scale.class);
-                if (scale == null) {
-                    scale = defaultScale;
-                }
-                Position position = readable.getComponent(entity, Position.class);
-                if (position == null) {
-                    position = defaultPosition;
-                }
-                Orientation orientation = readable.getComponent(entity, Orientation.class);
-                if (orientation == null) {
-                    orientation = defaulOrientation;
-                }
+                Scale scale = readable.getComponentOrStandard(entity, Scale.class);
+                Position position = readable.getComponentOrStandard(entity, Position.class);
+                Orientation orientation = readable.getComponentOrStandard(entity, Orientation.class);
+                
+                /*
+                 * FMat4 translationMatrix =
+                 * FMat4.newTranslation3(position.getVector()).transpose();
+                 * FMat4 rotationMatrix =
+                 * FMat4.newRot3FromQuaternion(orientation.getQuaternion()).transpose();
+                 * FMat4 scaleMatrix = FMat4.newScale3(scale.getVector()).transpose();
+                 * 
+                 * // FMat4 modelToWorldMatrix = new
+                 * // FMat4().mul(translationMatrix).mul(rotationMatrix).mul(scaleMatrix);
+                 * 
+                 * FMat4 modelToWorldMatrix = new FMat4(translationMatrix)
+                 * .premul((rotationMatrix).premul(scaleMatrix));
+                 * 
+                 * FMat4 worldToViewMatrix = FMat4
+                 * .newView3FromQuaternion(cameraPosition.getVector(),
+                 * cameraOrientation.getQuaternion())
+                 * .transpose();
+                 * 
+                 * // FMat4 viewToProjectionMatrix = FMat4.newPerspective3Fov(windowWidth /
+                 * (float)
+                 * // windowHeight,
+                 * // camera.getZNear(), camera.getZFar(), camera.getFOV()).transpose();
+                 * 
+                 * FMat4 viewToProjectionMatrix = FMat4.newPerspective3Fov(windowWidth / (float)
+                 * windowHeight,
+                 * camera.getZNear(), camera.getZFar(), camera.getFOV());
+                 * 
+                 * FMat4 modelToProjectionMatrix = new FMat4(viewToProjectionMatrix)
+                 * .premul(new FMat4(worldToViewMatrix).mul(modelToWorldMatrix));
+                 */
 
                 FMat4 translationMatrix = FMat4.newTranslation3(position.getVector()).transpose();
                 FMat4 rotationMatrix = FMat4.newRot3FromQuaternion(orientation.getQuaternion()).transpose();
                 FMat4 scaleMatrix = FMat4.newScale3(scale.getVector()).transpose();
 
-                // FMat4 modelToWorldMatrix = new
-                // FMat4().mul(translationMatrix).mul(rotationMatrix).mul(scaleMatrix);
+                FMat4 modelToWorldMatrix = new FMat4(translationMatrix).premul((rotationMatrix).premul(scaleMatrix));
 
-                FMat4 modelToWorldMatrix = new FMat4(translationMatrix)
-                        .premul(new FMat4(rotationMatrix).premul(scaleMatrix));
-
-                FMat4 worldToViewMatrix = FMat4.newView3FromQuaternion(cameraPosition.getVector(), cameraOrientation.getQuaternion()).transpose();
-
-               // FMat4 viewToProjectionMatrix = FMat4.newPerspective3Fov(windowWidth / (float) windowHeight,
-                  //      camera.getZNear(), camera.getZFar(), camera.getFOV()).transpose();
-
-                FMat4 viewToProjectionMatrix = FMat4.newPerspective3Fov(windowWidth / (float) windowHeight, camera.getZNear(), camera.getZFar(), camera.getFOV());
-
-                FMat4 modelToProjectionMatrix = new FMat4(viewToProjectionMatrix)
-                        .premul(new FMat4(worldToViewMatrix).mul(modelToWorldMatrix));
-
-                /*
-                 * // local model space => world space => view space => projection space
-                 * FMat4 modelToProjectionMatrix = new FMat4()
-                 * // #3 view space to projection space
-                 * .mulPerspective3Fov(windowWidth / (float) windowHeight, camera.getZNear(),
-                 * camera.getZFar(),
-                 * camera.getFOV())
-                 * // #2 world space to view space
-                 * .mulView3FromQuaternion(cameraPosition.getVector(),
-                 * cameraOrientation.getQuaternion())
-                 * // #1 model space to world space
-                 * .mul(translationMatrix)
-                 * .mul(rotationMatrix)
-                 * .mul(scaleMatrix);
-                 */
+                // local model space => world space => view space => projection space
+                FMat4 modelToProjectionMatrix = new FMat4()
+                        // #3 view space to projection space
+                        .mul(FMat4.newPerspective3Fov(windowWidth / (float) windowHeight, camera.getZNear(),
+                                camera.getZFar(),
+                                camera.getFOV()))
+                        // #2 world space to view space
+                        .mulView3FromQuaternion(cameraPosition.getVector(),
+                                new FQuaternion(cameraOrientation.getQuaternion()))
+                        // #1 model space to world space
+                        .mulTranslation3(position.getVector())
+                        .mulRot3FromQuaternion(orientation.getQuaternion())
+                        .mulScale3(scale.getVector());
 
                 FMat4 textureMatrix = new FMat4(1.0f / texture.getSizeOfAtlas().getX(), 0, 0, 0, 0,
                         1.0f / texture.getSizeOfAtlas().getY(), 0, 0,
                         texture.getPositionOnAtlas().getX() / texture.getSizeOfAtlas().getX(),
                         texture.getPositionOnAtlas().getY() / texture.getSizeOfAtlas().getY(), 0, 0, 0, 0, 0, 0);
 
-                getShader().setUniform("worldMat", modelToWorldMatrix);
-                getShader().setUniform("projectedMat", modelToProjectionMatrix);
+                getShader().setUniform("MWMatrix", modelToWorldMatrix);
+                getShader().setUniform("MWVPMatrix", modelToProjectionMatrix.transpose());
                 getShader().setUniform("cameraPosition", cameraPosition.getVector());
                 getShader().setUniform("textureMat", textureMatrix);
                 getShader().setUniform("textureRepeat", texture.getRepeatVecor());
@@ -164,8 +160,6 @@ public class Render extends EcsSystem {
                 getShader().setUniform("directionalLight.base.color", directionalLight.getColor());
                 getShader().setUniform("directionalLight.base.intensity", directionalLight.getIntensity());
                 getShader().setUniform("directionalLight.direction", directionalLight.getDirection());
-
-            
 
                 // if a different mesh occurs load new one
                 if (meshReference.getVAO() != currMesh) {

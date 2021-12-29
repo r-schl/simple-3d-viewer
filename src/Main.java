@@ -1,6 +1,7 @@
 
 import java.util.Arrays;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjglx.util.vector.Quaternion;
 
 import ecs.EventDispatcher;
@@ -28,22 +29,24 @@ class Main {
 
                 // camera
                 writable.putComponent(10, new Camera(90, 0.1f, 1000f));
-                writable.putComponent(10, new Orientation(FQuaternion.newRotation(0, FVec3.YAXIS)));
-                writable.putComponent(10, new AutoRotation());
+                FQuaternion rotation = FQuaternion.newRotation(45, FVec3.YAXIS);
+                rotation.premul(FQuaternion.newRotation(30, new FVec3(FVec3.XAXIS).rotateQuaternion(rotation)));
+                writable.putComponent(10, new FollowTarget(15, 18, rotation));
+                writable.putComponent(10, new FollowTargetControl());
 
                 // environment
-                writable.putComponent(1, new DirectionalLight(new FVec3(0, 0.8f, 0.8f), new FVec3(1), 0.9),
+                writable.putComponent(1, new DirectionalLight(new FVec3(0, -0.8f, 0.8f), new FVec3(1), 0.9),
                         new AmbientLight(new FVec3(0.4f)));
 
-                // object
-                writable.putComponent(24, new TextureLoader().loadPNGFile("src/res/textures/Unbenannt.png"),
-                        new MeshLoader().loadOBJFile("src/res/objects/dragon.obj"), new Position(new FVec3(0, 0, -10)));
-                // writable.putComponent(24, new AutoRotation());
+                writable.putComponent(15, new Position(new FVec3(0, 0, 0)));
 
-                writable.putComponent(24, new AutoRotation());
+                TextureReference tr = new TextureLoader().loadPNGFile("src/res/textures/Unbenannt.png");
+                MeshReference mr = new MeshLoader().loadOBJFile("src/res/objects/cube.obj");
 
-                // int[] entities = writable.filterEntities(TextureReference.class);
-                // System.out.println(Arrays.toString(entities));
+
+                writable.putComponent(20, tr, mr, new Position(new FVec3(0, 0, 0)), new Scale(new FVec3(8, 1, 8)));
+
+
             });
 
         });
@@ -62,6 +65,26 @@ class Main {
         autoRotation.setStore(store);
         autoRotation.setEventDispatcher(eventDispatcher);
         autoRotation.startOnThread();
+
+        FollowTargetControlSystem thirdPersonViewInputSystem = new FollowTargetControlSystem();
+        thirdPersonViewInputSystem.setStore(store);
+        thirdPersonViewInputSystem.setEventDispatcher(eventDispatcher);
+        thirdPersonViewInputSystem.start();
+
+        FollowTargetSystem thirdPersonViewSystem = new FollowTargetSystem();
+        thirdPersonViewSystem.setStore(store);
+        thirdPersonViewSystem.setEventDispatcher(eventDispatcher);
+        thirdPersonViewSystem.start();
+
+        OscillationSystem blockMoveSystem = new OscillationSystem();
+        blockMoveSystem.setStore(store);
+        blockMoveSystem.setEventDispatcher(eventDispatcher);
+        blockMoveSystem.start();
+
+        BlockSpawnSystem blockSpawnSystem = new BlockSpawnSystem();
+        blockSpawnSystem.setStore(store);
+        blockSpawnSystem.setEventDispatcher(eventDispatcher);
+        blockSpawnSystem.start();
 
         Core coreSystem = new Core(60, 60);
         coreSystem.setStore(store);

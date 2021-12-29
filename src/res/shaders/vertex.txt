@@ -9,8 +9,13 @@ out vec3 normal0;
 out float visibility;
 
 uniform vec3 cameraPosition;
-uniform mat4 worldMat;
-uniform mat4 projectedMat;
+
+// Model-World matrix
+uniform mat4 MWMatrix;
+
+// Model-world-view-projection matrix
+uniform mat4 MWVPMatrix;
+
 uniform vec2 textureRepeat;
 
 uniform float fogDensity;
@@ -18,15 +23,15 @@ uniform float fogGradient;
 
 void main(void){
 
-    gl_Position = projectedMat * vec4(pos3.x, pos3.y, pos3.z, 1.0);
+    gl_Position = MWVPMatrix * vec4(pos3.x, pos3.y, pos3.z, 1.0);
 
-    float distance = length(cameraPosition - (worldMat * vec4(pos3,1.0)).xyz);
+    float distance = length(cameraPosition - (MWMatrix * vec4(pos3,1.0)).xyz);
     visibility = exp(-pow((distance * fogDensity), fogGradient));
     visibility = clamp(visibility, 0.0, 1.0);
  	
     texCoord0 = texCoords * textureRepeat;
 
-    normal0 = (worldMat * vec4(normal,0.0)).xyz;
+    normal0 = (MWMatrix * vec4(normal,0.0)).xyz;
 
 
 

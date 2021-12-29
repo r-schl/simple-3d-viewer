@@ -1,9 +1,14 @@
 package ecs.components;
 
 import ecs.Component;
+import linalib.flt.FVec3;
 import linalib.flt.FVec3Readable;
 
 public class DirectionalLight extends Component {
+
+    public static DirectionalLight standard() {
+        return new DirectionalLight(new FVec3(1), new FVec3(1), 1);
+    }
 
     private FVec3Readable direction;
     private FVec3Readable color;
@@ -26,4 +31,6 @@ public class DirectionalLight extends Component {
     public double getIntensity() {
         return this.intensity;
     }
+
+   
 }

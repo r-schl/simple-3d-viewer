@@ -1,5 +1,7 @@
 package ecs;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class StoreWritable implements StoreReadable {
@@ -76,6 +78,30 @@ public class StoreWritable implements StoreReadable {
     @Override
     public int countEntities(Class<? extends Component>... types) {
         return filterEntities(types).length;
+    }
+
+    @Override
+    public <T extends Component> T getComponentOrStandard(int entityId, Class<T> type) {
+        T component = this.getComponent(entityId, type);
+        if (component == null) {
+            try {
+                Method standard = type.getMethod("standard");
+                component = (T) standard.invoke(null);
+            } catch (NoSuchMethodException | SecurityException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return component;
     }
 
 }

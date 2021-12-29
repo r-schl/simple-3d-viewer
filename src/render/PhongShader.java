@@ -18,8 +18,8 @@ public class PhongShader extends ShaderProgram {
 
     @Override
     protected void getAllUniformLocations() {
-        super.declareUniform("worldMat");
-        super.declareUniform("projectedMat");
+        super.declareUniform("MWMatrix");
+        super.declareUniform("MWVPMatrix");
        super.declareUniform("cameraPosition");
         super.declareUniform("textureMat");
        super.declareUniform("textureRepeat");

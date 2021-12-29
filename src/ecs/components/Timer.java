@@ -5,15 +5,9 @@ import java.util.Date;
 import ecs.Component;
 
 public class Timer extends Component {
+  
 
-    private long startTime;
-
-    public Timer() {
-        this.startTime = System.currentTimeMillis();
+    public static Timer standard() {
+        return new Timer();
     }
-
-    public long getTime() {
-        return System.currentTimeMillis() - startTime;
-    }
-
 }
