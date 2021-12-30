@@ -29,10 +29,11 @@ class Main {
 
                 // camera
                 writable.putComponent(10, new Camera(90, 0.1f, 1000f));
+
                 FQuaternion rotation = FQuaternion.newRotation(45, FVec3.YAXIS);
                 rotation.premul(FQuaternion.newRotation(30, new FVec3(FVec3.XAXIS).rotateQuaternion(rotation)));
-                writable.putComponent(10, new FollowTarget(15, 18, rotation));
-                writable.putComponent(10, new FollowTargetControl());
+                writable.putComponent(10, new FixateOnTarget(15, 18, rotation));
+                writable.putComponent(10, new FixateOnTargetControl());
 
                 // environment
                 writable.putComponent(1, new DirectionalLight(new FVec3(0, -0.8f, 0.8f), new FVec3(1), 0.9),
@@ -43,9 +44,15 @@ class Main {
                 TextureReference tr = new TextureLoader().loadPNGFile("src/res/textures/Unbenannt.png");
                 MeshReference mr = new MeshLoader().loadOBJFile("src/res/objects/cube.obj");
 
+                MeshReference mr2 = new MeshLoader().loadOBJFile("src/res/objects/dragon.obj");
 
                 writable.putComponent(20, tr, mr, new Position(new FVec3(0, 0, 0)), new Scale(new FVec3(8, 1, 8)));
 
+                /*
+                 * writable.putComponent(19, tr, mr2,
+                 * new Position(new FVec3(0, 0, 0)),
+                 * new MoveToTarget(new FVec3(0, 10, 10), 4f));
+                 */
 
             });
 
@@ -66,12 +73,12 @@ class Main {
         autoRotation.setEventDispatcher(eventDispatcher);
         autoRotation.startOnThread();
 
-        FollowTargetControlSystem thirdPersonViewInputSystem = new FollowTargetControlSystem();
+        FixateOnTargetControlSystem thirdPersonViewInputSystem = new FixateOnTargetControlSystem();
         thirdPersonViewInputSystem.setStore(store);
         thirdPersonViewInputSystem.setEventDispatcher(eventDispatcher);
         thirdPersonViewInputSystem.start();
 
-        FollowTargetSystem thirdPersonViewSystem = new FollowTargetSystem();
+        FixateOnTargetSystem thirdPersonViewSystem = new FixateOnTargetSystem();
         thirdPersonViewSystem.setStore(store);
         thirdPersonViewSystem.setEventDispatcher(eventDispatcher);
         thirdPersonViewSystem.start();
@@ -85,6 +92,11 @@ class Main {
         blockSpawnSystem.setStore(store);
         blockSpawnSystem.setEventDispatcher(eventDispatcher);
         blockSpawnSystem.start();
+
+        MovementSystem velocitySystem = new MovementSystem();
+        velocitySystem.setStore(store);
+        velocitySystem.setEventDispatcher(eventDispatcher);
+        velocitySystem.start();
 
         Core coreSystem = new Core(60, 60);
         coreSystem.setStore(store);

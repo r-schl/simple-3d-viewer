@@ -7,8 +7,8 @@ import ecs.components.Keys;
 import ecs.components.MouseCursor;
 import ecs.components.MouseScroll;
 import ecs.components.Orientation;
-import ecs.components.FollowTarget;
-import ecs.components.FollowTargetControl;
+import ecs.components.FixateOnTarget;
+import ecs.components.FixateOnTargetControl;
 import linalib.flt.FQuaternion;
 import linalib.flt.FQuaternionReadable;
 import linalib.flt.FVec2;
@@ -16,7 +16,7 @@ import linalib.flt.FVec2Readable;
 import linalib.flt.FVec3;
 import linalib.flt.FVec3Readable;
 
-public class FollowTargetControlSystem extends EcsSystem {
+public class FixateOnTargetControlSystem extends EcsSystem {
 
     @Override
     public void init() {
@@ -42,7 +42,7 @@ public class FollowTargetControlSystem extends EcsSystem {
             Keys keys = writable.getComponent(0, Keys.class);
             MouseScroll mouseScroll = writable.getComponent(0, MouseScroll.class);
 
-            for (int entityId : writable.filterEntities(FollowTargetControl.class)) {
+            for (int entityId : writable.filterEntities(FixateOnTargetControl.class)) {
 
                 if (isScrolling) {
                     this.zoomLevel = mouseScroll.getScroll().getY() * -0.4f;
@@ -60,7 +60,7 @@ public class FollowTargetControlSystem extends EcsSystem {
                         pitchLevel = pitchLevel - pitchLevel / 7;
                 }
 
-                FollowTarget thirdPersonView = writable.getComponent(entityId, FollowTarget.class);
+                FixateOnTarget thirdPersonView = writable.getComponent(entityId, FixateOnTarget.class);
                 if (thirdPersonView == null)
                     continue;
 
@@ -77,7 +77,7 @@ public class FollowTargetControlSystem extends EcsSystem {
                 float distance1 = distance0 + zoomLevel;
                 distance1 = distance1 < 0 ? 0 : distance1;
 
-                writable.putComponent(entityId, new FollowTarget(targetId, distance1, rotation1));
+                writable.putComponent(entityId, new FixateOnTarget(targetId, distance1, rotation1));
             }
 
             mouseLastFrame = mouseThisFrame;

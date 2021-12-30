@@ -8,6 +8,7 @@ import ecs.EcsSystem;
 import ecs.components.AutoRotation;
 import ecs.components.Keys;
 import ecs.components.MeshReference;
+import ecs.components.MoveToTarget;
 import ecs.components.Scale;
 import ecs.components.StackBlock;
 import ecs.components.Oscillation;
@@ -84,7 +85,7 @@ public class BlockSpawnSystem extends EcsSystem {
                         return;                    }
                    
                 }
-            }
+            } 
 
             Scale scale = writable.getComponent(20 + count, Scale.class);
             Position pos = writable.getComponent(20 + count, Position.class);
@@ -105,18 +106,19 @@ public class BlockSpawnSystem extends EcsSystem {
                         scale, new StackBlock());
             }
 
-            writable.putComponent(15, new Position(new FVec3(0, count, 0)));
+            writable.putComponent(15, new MoveToTarget(new FVec3(0, count, 0), 7f));
         });
     }
 
     private void onGameOver() {
-        count = 0;
         store().write((writable) -> {
             for (int entityId : writable.filterEntities(StackBlock.class)) {
                 writable.removeEntity(entityId);
             }
-            writable.putComponent(15, new Position(new FVec3(0, 0, 0)));
+            writable.removeComponent(15, MoveToTarget.class);
+            writable.putComponent(15, new Position(new FVec3(0)));
         });
+        count = 0;
     }
 
 }

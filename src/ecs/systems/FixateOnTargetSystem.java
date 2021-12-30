@@ -3,13 +3,13 @@ package ecs.systems;
 import ecs.EcsSystem;
 import ecs.components.Orientation;
 import ecs.components.Position;
-import ecs.components.FollowTarget;
+import ecs.components.FixateOnTarget;
 import linalib.flt.FQuaternion;
 import linalib.flt.FQuaternionReadable;
 import linalib.flt.FVec3;
 import linalib.flt.FVec3Readable;
 
-public class FollowTargetSystem extends EcsSystem {
+public class FixateOnTargetSystem extends EcsSystem {
 
     @Override
     public void init() {
@@ -18,8 +18,8 @@ public class FollowTargetSystem extends EcsSystem {
 
     private void onUpdate() {
         store().write((writable) -> {
-            for (int entityId : writable.filterEntities(FollowTarget.class)) {
-                FollowTarget thirdPersonView = writable.getComponent(entityId, FollowTarget.class);
+            for (int entityId : writable.filterEntities(FixateOnTarget.class)) {
+                FixateOnTarget thirdPersonView = writable.getComponent(entityId, FixateOnTarget.class);
                 int targetId = thirdPersonView.getEntityId();
                 float distance = thirdPersonView.getDistance();
                 FQuaternionReadable rotationRelativeToTarget = thirdPersonView.getRotation();
