@@ -1,29 +1,31 @@
 package ecs.components;
 
 import ecs.Component;
-import linalib.flt.FVec2Readable;
-import linalib.flt.FVec3Readable;
-import linalib.flt.*;
+import linalib.Vec2;
+import linalib.Vec2Readable;
+import linalib.Vec3;
+import linalib.Vec3Readable;
+
 
 public class TextureReference extends Component {
 
     private int location;
     private boolean hasTransparency;
-    private FVec2Readable sizeOfAtlas;
-    private FVec2Readable positionOnAtlas;
-    private FVec2Readable repeatVector;
-    private FVec3Readable dyeColor;
+    private Vec2Readable sizeOfAtlas;
+    private Vec2Readable positionOnAtlas;
+    private Vec2Readable repeatVector;
+    private Vec3Readable dyeColor;
 
     public TextureReference(int location) {
         this(location, false);
     }
 
     public TextureReference(int location, boolean hasTransparency) {
-        this(location, new FVec2(1), new FVec2(0), new FVec3(1), new FVec2(1));
+        this(location, new Vec2(1), new Vec2(0), new Vec3(1), new Vec2(1));
     }
 
-    public TextureReference(int location, FVec2Readable sizeOfAtlas, FVec2Readable atlasPosition, FVec3Readable dyeColor,
-            FVec2Readable repeat) {
+    public TextureReference(int location, Vec2Readable sizeOfAtlas, Vec2Readable atlasPosition, Vec3Readable dyeColor,
+            Vec2Readable repeat) {
         this.location = location;
         this.sizeOfAtlas = sizeOfAtlas;
         this.positionOnAtlas = atlasPosition;
@@ -39,19 +41,19 @@ public class TextureReference extends Component {
         return this.hasTransparency;
     }
 
-    public FVec2Readable getSizeOfAtlas() {
+    public Vec2Readable getSizeOfAtlas() {
         return this.sizeOfAtlas;
     }
 
-    public FVec2Readable getPositionOnAtlas() {
+    public Vec2Readable getPositionOnAtlas() {
         return this.positionOnAtlas;
     }
 
-    public FVec2Readable getRepeatVecor() {
+    public Vec2Readable getRepeatVecor() {
         return this.repeatVector;
     }
 
-    public FVec3Readable getDyeColor() {
+    public Vec3Readable getDyeColor() {
         return this.dyeColor;
     }
 

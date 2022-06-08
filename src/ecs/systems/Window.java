@@ -11,7 +11,7 @@ import ecs.components.MouseCursor;
 import ecs.components.MouseScroll;
 import ecs.components.Timer;
 import ecs.components.WindowInformation;
-import linalib.flt.FVec2;
+import linalib.Vec2;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.glViewport;
@@ -32,8 +32,8 @@ public class Window extends EcsSystem {
     private GLFWScrollCallback scrollCallback;
 
     private int[] keys;
-    private FVec2 mouse;
-    private FVec2 scroll;
+    private Vec2 mouse;
+    private Vec2 scroll;
 
     public Window(int width, int height, String title) {
         this.width = width;
@@ -45,14 +45,14 @@ public class Window extends EcsSystem {
     public void init() {
 
         keys = new int[GLFW.GLFW_KEY_LAST];
-        mouse = new FVec2(0);
-        scroll = new FVec2(0);
+        mouse = new Vec2(0);
+        scroll = new Vec2(0);
 
         store().write((writable) -> {
-            writable.putComponent(0, new WindowInformation(width, height));
-            writable.putComponent(0, new Keys(keys));
-            writable.putComponent(0, new MouseCursor(mouse));
-            writable.putComponent(0, new MouseScroll(mouse));
+            writable.putComponent0(0, new WindowInformation(width, height));
+            writable.putComponent0(0, new Keys(keys));
+            writable.putComponent0(0, new MouseCursor(mouse));
+            writable.putComponent0(0, new MouseScroll(mouse));
         });
         register("window:create", 10, this::onCreateWindow);
         register("update", 10, this::onUpdate);
@@ -60,10 +60,10 @@ public class Window extends EcsSystem {
         register("stop", -1, this::onStop);
         register("clock:1sec", 0, () -> {
             store().read((readable) -> {
-                LoopInformation li = readable.getComponent(0, LoopInformation.class);
-                Timer timer = readable.getComponent(0, Timer.class);
+                LoopInformation li = readable.getComponent0(0, LoopInformation.class);
+                Timer timer = readable.getComponent0(0, Timer.class);
                 glfwSetWindowTitle(window, "3D Viewer   [FPS: " + li.getCurrentFPS() + " UPS: " + li.getCurrentUPS()
-                        + "] " + timer.readTimer());
+                        + "] " + timer.getLifeTime());
             });
         });
     }
@@ -86,7 +86,7 @@ public class Window extends EcsSystem {
             // resize
             if (hasResized) {
                 store().write((writable) -> {
-                    writable.putComponent(0, new WindowInformation(width, height));
+                    writable.putComponent0(0, new WindowInformation(width, height));
                 });
                 glViewport(0, 0, width, height);
                 hasResized = false;
@@ -142,7 +142,7 @@ public class Window extends EcsSystem {
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 keys[key] = action;
                 store().write((writable) -> {
-                    writable.putComponent(0, new Keys(keys));
+                    writable.putComponent0(0, new Keys(keys));
                 });
                 trigger("input key " + key + " " + action);
             }
@@ -152,9 +152,9 @@ public class Window extends EcsSystem {
         mousePosCallBack = new GLFWCursorPosCallback() {
             @Override
             public void invoke(long window, double xpos, double ypos) {
-                mouse = new FVec2((float) xpos, (float) ypos);
+                mouse = new Vec2((float) xpos, (float) ypos);
                 store().write((writable) -> {
-                    writable.putComponent(0, new MouseCursor(mouse));
+                    writable.putComponent0(0, new MouseCursor(mouse));
                 });
             }
         };
@@ -165,7 +165,7 @@ public class Window extends EcsSystem {
             public void invoke(long window, int button, int action, int mods) {
                 keys[button] = action;
                 store().write((writable) -> {
-                    writable.putComponent(0, new Keys(keys));
+                    writable.putComponent0(0, new Keys(keys));
                 });
                 trigger("input key");
                 trigger("input key " + button + " " + action);
@@ -176,9 +176,9 @@ public class Window extends EcsSystem {
         scrollCallback = new GLFWScrollCallback() {
             @Override
             public void invoke(long window, double xoffset, double yoffset) {
-                scroll = new FVec2((float) xoffset, (float) yoffset);
+                scroll = new Vec2((float) xoffset, (float) yoffset);
                 store().write((writable) -> {
-                    writable.putComponent(0, new MouseScroll(scroll));
+                    writable.putComponent0(0, new MouseScroll(scroll));
                 });
                 trigger("input scroll");
             }

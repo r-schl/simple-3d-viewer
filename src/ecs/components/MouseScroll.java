@@ -1,18 +1,18 @@
 package ecs.components;
 
 import ecs.Component;
-import linalib.flt.FVec2;
-import linalib.flt.FVec2Readable;
+import linalib.Vec2Readable;
+
 
 public class MouseScroll extends Component {
 
-    private FVec2Readable scroll;
+    private Vec2Readable scroll;
 
-    public MouseScroll(FVec2Readable scroll) {
+    public MouseScroll(Vec2Readable scroll) {
         this.scroll = scroll;
     }
 
-    public FVec2Readable getScroll() {
+    public Vec2Readable getScroll() {
         return this.scroll;
     }
 }

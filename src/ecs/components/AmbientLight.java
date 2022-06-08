@@ -1,22 +1,22 @@
 package ecs.components;
 
 import ecs.Component;
-import linalib.flt.FVec3;
-import linalib.flt.FVec3Readable;
+import linalib.Vec3;
+import linalib.Vec3Readable;
 
 public class AmbientLight extends Component {
 
     public static AmbientLight standard() {
-        return new AmbientLight(new FVec3(1));
+        return new AmbientLight(new Vec3(1));
     }
 
-    private FVec3Readable color;
+    private Vec3Readable color;
 
-    public AmbientLight(FVec3Readable color) {
+    public AmbientLight(Vec3Readable color) {
         this.color = color;
     }
 
-    public FVec3Readable getColor() {
+    public Vec3Readable getColor() {
         return this.color;
     }
 

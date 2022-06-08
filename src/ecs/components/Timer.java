@@ -10,4 +10,8 @@ public class Timer extends Component {
     public static Timer standard() {
         return new Timer();
     }
+
+    public long read() {
+        return this.getLifeTime();
+    }
 }

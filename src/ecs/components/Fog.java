@@ -1,20 +1,22 @@
 package ecs.components;
 
 import ecs.Component;
-import linalib.flt.FVec3;
-import linalib.flt.FVec3Readable;
+import linalib.Vec3;
+import linalib.Vec3Readable;
+
 
 public class Fog extends Component {
 
+    public static Fog STANDARD = new Fog(0, 1, new Vec3(0));
     public static Fog standard() {
-        return new Fog(0, 1, new FVec3(0));
+        return STANDARD;
     }
 
     private double density;
     private double gradient;
-    private FVec3Readable color;
+    private Vec3Readable color;
 
-    public Fog(double density, double gradient, FVec3Readable color) {
+    public Fog(double density, double gradient, Vec3Readable color) {
         this.density = density;
         this.gradient = gradient;
         this.color = color;
@@ -28,9 +30,8 @@ public class Fog extends Component {
         return this.gradient;
     }
 
-    public FVec3Readable getColor() {
+    public Vec3Readable getColor() {
         return this.color;
     }
 
-   
 }

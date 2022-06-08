@@ -1,28 +1,28 @@
 package ecs.components;
 
-import linalib.flt.FQuaternion;
-import linalib.flt.FQuaternionReadable;
-import linalib.flt.FVec3;
 import ecs.Component;
+import linalib.Quaternion;
+import linalib.QuaternionReadable;
+import linalib.Vec3;
 
 public class Orientation extends Component {
 
     public static Orientation standard() {
-        return new Orientation(new FQuaternion().initRotation(0, FVec3.YAXIS));
+        return new Orientation(Quaternion.initRotation(Vec3.YAXIS, 0));
     }
 
-    FQuaternionReadable quaternion;
+    QuaternionReadable quaternion;
 
-    public Orientation(FQuaternionReadable quaternion) {
+    public Orientation(QuaternionReadable quaternion) {
         this.quaternion = quaternion;
     }
 
-    public FQuaternionReadable getQuaternion() {
+    public QuaternionReadable getQuaternion() {
         return this.quaternion;
     }
 
-    public Orientation getRotated(FQuaternionReadable otherQuaternion) {
-        FQuaternion q = new FQuaternion(this.quaternion);
+    public Orientation getRotated(QuaternionReadable otherQuaternion) {
+        Quaternion q = new Quaternion(this.quaternion);
         q.premul(otherQuaternion);
         return new Orientation(q);
     }

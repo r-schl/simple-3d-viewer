@@ -16,6 +16,9 @@ public abstract class EcsSystem {
 
     private Object synchronizedObject = new Object();
 
+    private static int availableSystemId = 1;
+    private int systemId;
+
     public Store store() {
         return this.store;
     }
@@ -94,6 +97,16 @@ public abstract class EcsSystem {
 
     public void trigger(String messsage) {
         this.eventDispatcher.trigger(messsage);
+    }
+
+    public void set(Store store, EventDispatcher eventDispatcher) {
+        this.store = store;
+        this.eventDispatcher = eventDispatcher;
+        this.systemId = availableSystemId++;
+    }
+
+    public int getSystemId() {
+        return this.systemId;
     }
 
     public void setStore(Store store) {

@@ -6,11 +6,12 @@ import ecs.EcsSystem;
 
 import ecs.components.*;
 import ecs.events.TestEvent;
-import linalib.flt.*;
+import linalib.Quaternion;
+import linalib.Vec3;
 
 public class AutoRotationSystem extends EcsSystem {
 
-    Orientation defaulOrientation = new Orientation(new FQuaternion().initRotation(0, FVec3.YAXIS));
+    Orientation defaulOrientation = new Orientation(Quaternion.initRotation(Vec3.YAXIS, 0));
 
     @Override
     public void init() {
@@ -19,15 +20,15 @@ public class AutoRotationSystem extends EcsSystem {
 
     private void onUpdate() {
         store().write((writable) -> {
-            for (int entity : writable.filterEntities(AutoRotation.class)) {
-                Orientation orientation = writable.getComponent(entity, Orientation.class);
+            for (int entity : writable.filterEntities0(AutoRotation.class)) {
+                Orientation orientation = writable.getComponent0(entity, Orientation.class);
                 if (orientation == null)
                     orientation = defaulOrientation;
 
-                Orientation newOrientation = orientation.getRotated(FQuaternion.newRotation(0.2f, FVec3.YAXIS));
-                // newOrientation = newOrientation.getRotated(FQuaternion.newRotation(1,
-                // FVec3.XAXIS));
-                writable.putComponent(entity, newOrientation);
+                Orientation newOrientation = orientation.getRotated(Quaternion.initRotation(Vec3.YAXIS, 0.2f));
+                // newOrientation = newOrientation.getRotated(Quaternion.newRotation(1,
+                // Vec3.XAXIS));
+                writable.putComponent0(entity, newOrientation);
             }
         });
     }

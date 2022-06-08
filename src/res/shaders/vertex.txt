@@ -1,10 +1,10 @@
 #version 400 core
 
-in vec3 pos3;
-in vec2 texCoords;
+in vec3 position;
+in vec2 textureCoordinates;
 in vec3 normal;
 
-out vec2 texCoord0;
+out vec2 textureCoordinates0;
 out vec3 normal0;
 out float visibility;
 
@@ -23,13 +23,13 @@ uniform float fogGradient;
 
 void main(void){
 
-    gl_Position = MWVPMatrix * vec4(pos3.x, pos3.y, pos3.z, 1.0);
+    gl_Position = MWVPMatrix * vec4(position, 1.0);
 
-    float distance = length(cameraPosition - (MWMatrix * vec4(pos3,1.0)).xyz);
+    float distance = length(cameraPosition - (MWMatrix * vec4(position,1.0)).xyz);
     visibility = exp(-pow((distance * fogDensity), fogGradient));
     visibility = clamp(visibility, 0.0, 1.0);
  	
-    texCoord0 = texCoords * textureRepeat;
+    textureCoordinates0 = textureCoordinates * textureRepeat;
 
     normal0 = (MWMatrix * vec4(normal,0.0)).xyz;
 

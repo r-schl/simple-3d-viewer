@@ -3,7 +3,8 @@ package render;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import linalib.flt.*;
+import linalib.Mat4Readable;
+
 
 public class BufferUtils {
 
@@ -22,10 +23,10 @@ public class BufferUtils {
         return buffer;
     }
 
-    public static FloatBuffer flippedFloat(FMat4Readable matrix) {
+    public static FloatBuffer flippedFloat(Mat4Readable matrix) {
         FloatBuffer buffer = floatBuffer(4 * 4);
         // value.store(buffer);
-        matrix.storeInside(buffer);
+        matrix.storeInBuffer(buffer);
         buffer.flip();
         return buffer;
     }

@@ -1,17 +1,17 @@
 package ecs.components;
 
 import ecs.Component;
-import linalib.flt.FVec2Readable;
+import linalib.Vec2Readable;
 
 public class MouseCursor extends Component {
 
-    private FVec2Readable position;
+    private Vec2Readable position;
 
-    public MouseCursor(FVec2Readable position) {
+    public MouseCursor(Vec2Readable position) {
         this.position = position;
     }
 
-    public FVec2Readable getPosition() {
+    public Vec2Readable getPosition() {
         return this.position;
     }
     

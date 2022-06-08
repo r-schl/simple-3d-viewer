@@ -6,12 +6,12 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-import linalib.flt.*;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import ecs.Component;
+import linalib.Vec3;
 
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
@@ -88,15 +88,15 @@ public class MeshReference extends Component {
             int i0 = indices[i];
             int i1 = indices[i + 1];
             int i2 = indices[i + 2];
-            FVec3 pos0 = new FVec3(positions[i0 * 3], positions[i0 * 3 + 1], positions[i0 * 3 + 2]);
-            FVec3 pos1 = new FVec3(positions[i1 * 3], positions[i1 * 3 + 1], positions[i1 * 3 + 2]);
-            FVec3 pos2 = new FVec3(positions[i2 * 3], positions[i2 * 3 + 1], positions[i2 * 3 + 2]);
+            Vec3 pos0 = new Vec3(positions[i0 * 3], positions[i0 * 3 + 1], positions[i0 * 3 + 2]);
+            Vec3 pos1 = new Vec3(positions[i1 * 3], positions[i1 * 3 + 1], positions[i1 * 3 + 2]);
+            Vec3 pos2 = new Vec3(positions[i2 * 3], positions[i2 * 3 + 1], positions[i2 * 3 + 2]);
 
-            FVec3 v1 = new FVec3(pos1).sub(pos0);
-            FVec3 v2 = new FVec3(pos2).sub(pos0);
+            Vec3 v1 = new Vec3(pos1).sub(pos0);
+            Vec3 v2 = new Vec3(pos2).sub(pos0);
 
-            FVec3 normal = new FVec3(v1).cross(v2);
-            if (normal.len() != 0)
+            Vec3 normal = new Vec3(v1).cross(v2);
+            if (normal.getLen() != 0)
                 normal.normalize();
 
             normals[i0 * 3] += normal.x;

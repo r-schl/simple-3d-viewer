@@ -3,13 +3,16 @@ package render;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
+import linalib.Mat4Readable;
+import linalib.Vec2Readable;
+import linalib.Vec3Readable;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import linalib.flt.*;
 
 public abstract class ShaderProgram {
 
@@ -86,7 +89,7 @@ public abstract class ShaderProgram {
     }
 
     // edit uniforms
-    public void setUniform(String uniform, FVec3Readable vec) {
+    public void setUniform(String uniform, Vec3Readable vec) {
         if (!uniforms.containsKey(uniform))
             return;
         if (uniforms.get(uniform) != null) {
@@ -94,7 +97,7 @@ public abstract class ShaderProgram {
         }
     }
 
-    public void setUniform(String uniform, FVec2Readable vector2f) {
+    public void setUniform(String uniform, Vec2Readable vector2f) {
         if (!uniforms.containsKey(uniform))
             return;
         if (uniforms.get(uniform) != null) {
@@ -129,7 +132,7 @@ public abstract class ShaderProgram {
         }
     }
 
-    public void setUniform(String uniform, FMat4Readable mat) {
+    public void setUniform(String uniform, Mat4Readable mat) {
         if (uniforms.get(uniform) != null) {
             GL20.glUniformMatrix4fv(uniforms.get(uniform), false, BufferUtils.flippedFloat(mat));
         }

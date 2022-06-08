@@ -37,7 +37,7 @@ public class Core extends EcsSystem {
 
     private void onStartLoop() {
             // Start a timer
-            store().write((writable) -> writable.putComponent(0, new Timer()));
+            store().write((writable) -> writable.putComponent0(0, new Timer()));
 
             long timer = System.currentTimeMillis(); // for information
             double lastTime = System.nanoTime();
@@ -65,7 +65,7 @@ public class Core extends EcsSystem {
                     timer += 1000;
                     seconds++;
                     store().write((writable) -> {
-                        writable.putComponent(0, new LoopInformation(frames, ticks));
+                        writable.putComponent0(0, new LoopInformation(frames, ticks));
                     });
                     trigger("clock:1sec");
                     frames = 0;

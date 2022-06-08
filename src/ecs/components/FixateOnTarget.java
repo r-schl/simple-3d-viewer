@@ -1,9 +1,9 @@
 package ecs.components;
 
 import ecs.Component;
-import linalib.flt.FQuaternion;
-import linalib.flt.FQuaternionReadable;
-import linalib.flt.FVec3;
+import linalib.Quaternion;
+import linalib.QuaternionReadable;
+import linalib.Vec3;
 
 public class FixateOnTarget extends Component {
 
@@ -12,16 +12,16 @@ public class FixateOnTarget extends Component {
     // distance to the entity
     private float distance;
     // rotation of the camera relative to the entities forward vector
-    private FQuaternionReadable rotation;
+    private QuaternionReadable rotation;
 
-    public FixateOnTarget(int entityId, float distance, FQuaternionReadable rotation) {
+    public FixateOnTarget(int entityId, float distance, QuaternionReadable rotation) {
         this.entityId = entityId;
         this.distance = distance;
         this.rotation = rotation;
     }
 
     public FixateOnTarget(int entityId, float distance) {
-        this(entityId, distance, FQuaternion.newRotation(0, FVec3.YAXIS));
+        this(entityId, distance, Quaternion.initRotation(Vec3.YAXIS, 0));
     }
 
     public int getEntityId() {
@@ -32,7 +32,7 @@ public class FixateOnTarget extends Component {
         return this.distance;
     }
 
-    public FQuaternionReadable getRotation() {
+    public QuaternionReadable getRotation() {
         return this.rotation;
     }
 
