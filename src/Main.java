@@ -8,6 +8,7 @@ import ecs.MeshLoader;
 import ecs.components.*;
 import ecs.systems.*;
 import linalib.Quaternion;
+import linalib.QuaternionReadable;
 import linalib.Vec3;
 import ecs.Store;
 import ecs.TextureLoader;
@@ -29,9 +30,11 @@ class Main {
                 // camera
                 writable.putComponent0(10, new Camera(90, 0.1f, 1000f));
 
-                Quaternion rotation = Quaternion.initRotation(Vec3.YAXIS, 45);
-                rotation.premul(Quaternion.initRotation(new Vec3(Vec3.XAXIS).rotateByQuaternion(rotation), 30));
-                writable.putComponent0(10, new FixateOnTarget(15, 18, rotation));
+                Quaternion orientation = Quaternion.initRotation(Vec3.YAXIS, 45);
+                Vec3 rotatedXAxis = Vec3.rotateByQuaternion(Vec3.XAXIS, orientation);
+                orientation.premul(Quaternion.initRotation(rotatedXAxis, 30));
+
+                writable.putComponent0(10, new FixateOnTarget(15, 18, orientation));
                 writable.putComponent0(10, new FixateOnTargetControl());
 
                 // Ambient light

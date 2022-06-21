@@ -6,6 +6,14 @@ import java.util.*;
 
 public class StoreWritable implements StoreReadable {
 
+    /*
+     * Here you can save components for an entity. There are different scenes (they
+     * are independent from each other). The main scene is scene number 0. An entity
+     * is addressed by an Id. For each scene, each entity can have only one
+     * component of the same type (class).
+     * 
+     */
+
     private Map<Class<? extends Component>, Map<Integer, Map<Integer, Component>>> componentsMap = Collections
             .synchronizedMap(new HashMap<>());
 

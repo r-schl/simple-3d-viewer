@@ -17,7 +17,6 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
-
 public class Render extends EcsSystem {
 
     protected PhongShader shader = new PhongShader();
@@ -64,7 +63,7 @@ public class Render extends EcsSystem {
             // Fog
             int[] fogEntities = readable.filterEntities0(Fog.class);
             Fog fog = fogEntities.length > 0 ? readable.getComponent0(fogEntities[0], Fog.class) : Fog.standard();
-            
+
             // Directional light
             int[] lightPlaneComponents = readable.filterEntities0(LightPlane.class);
             LightPlane lightPlane;
@@ -100,25 +99,38 @@ public class Render extends EcsSystem {
                 Position position = readable.getComponentOrStandard0(entity, Position.class);
                 Orientation orientation = readable.getComponentOrStandard0(entity, Orientation.class);
 
-                Mat4 translationMatrix = Mat4.initTranslation3(position.getVector()).transpose();
-                Mat4 rotationMatrix = Mat4.initRot3FromQuaternion(orientation.getQuaternion()).transpose();
-                Mat4 scaleMatrix = Mat4.initScale3(scale.getVector()).transpose();
+                // Local model space ==> world space. (scale, rotation, translation)
+                Mat4 translationMatrix = Mat4.initTranslation3(position.getVector());
+                Mat4 rotationMatrix = Mat4.initRot3FromQuaternion(orientation.getQuaternion());
+                Mat4 scaleMatrix = Mat4.initScale3(scale.getVector());
+                // Multiply scale, rotation and translation matrix together.
+                Mat4 modelToWorldMatrix = new Mat4(translationMatrix).mul(rotationMatrix).mul(scaleMatrix);
 
-                Mat4 modelToWorldMatrix = new Mat4(translationMatrix).premul((rotationMatrix).premul(scaleMatrix));
+                // World space ==> view space.
+                Mat4 worldSpaceToViewSpaceMatrix = Mat4.initView3FromQuaternion(cameraPosition.getVector(),
+                        new Quaternion(cameraOrientation.getQuaternion()));
 
-                // local model space => world space => view space => projection space
+                // View space ==> projection space. (Note that this matrix works with
+                // homogeneous coordinates. So to get the true coordinates you have to divide
+                // the vector first by w and then by z (OpenGL does this for you))
+                Mat4 viewSpaceToProjectionSpaceMatrix = Mat4.initPerspective3FoV(windowWidth / (float) windowHeight,
+                        camera.getZNear(),
+                        camera.getZFar(),
+                        camera.getFOV());
+
+                // Multiply all these matrices together.
+                // Local model space => world space => view space => projection space
                 Mat4 modelToProjectionMatrix = new Mat4()
-                        // #3 view space to projection space
-                        .mul(Mat4.initPerspective3FoV(windowWidth / (float) windowHeight, camera.getZNear(),
-                                camera.getZFar(),
-                                camera.getFOV()))
-                        // #2 world space to view space
-                        .mul(Mat4.initView3FromQuaternion(cameraPosition.getVector(),
-                                new Quaternion(cameraOrientation.getQuaternion())))
-                        // #1 model space to world space
-                        .mul(Mat4.initTranslation3(position.getVector()))
-                        .mul(Mat4.initRot3FromQuaternion(orientation.getQuaternion()))
-                        .mul(Mat4.initScale3(scale.getVector()));
+                        // #3 view space ==> projection space
+                        .mul(viewSpaceToProjectionSpaceMatrix)
+                        // #2 world space ==> view space
+                        .mul(worldSpaceToViewSpaceMatrix)
+                        // #1 model space ==> world space
+                        .mul(modelToWorldMatrix);
+
+                // Transpose all matrices because OpenGl works with column-major matrices
+                modelToWorldMatrix.transpose();
+                modelToProjectionMatrix.transpose();
 
                 Mat4 textureMatrix = new Mat4(1.0f / texture.getSizeOfAtlas().getX(), 0, 0, 0, 0,
                         1.0f / texture.getSizeOfAtlas().getY(), 0, 0,
@@ -126,7 +138,7 @@ public class Render extends EcsSystem {
                         texture.getPositionOnAtlas().getY() / texture.getSizeOfAtlas().getY(), 0, 0, 0, 0, 0, 0);
 
                 getShader().setUniform("MWMatrix", modelToWorldMatrix);
-                getShader().setUniform("MWVPMatrix", modelToProjectionMatrix.transpose());
+                getShader().setUniform("MWVPMatrix", modelToProjectionMatrix);
                 getShader().setUniform("cameraPosition", cameraPosition.getVector());
                 getShader().setUniform("textureMat", textureMatrix);
                 getShader().setUniform("textureRepeat", texture.getRepeatVecor());
