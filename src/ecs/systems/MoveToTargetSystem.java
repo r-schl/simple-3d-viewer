@@ -27,11 +27,11 @@ public class MoveToTargetSystem extends EcsSystem {
 
                 Vec3 positionToTarget = new Vec3(target).sub(position);
 
-                if (positionToTarget.getLen() == 0)
+                if (positionToTarget.getLength() == 0)
                     continue;
                 Vec3 d = new Vec3(positionToTarget).normalize().mul(speed).mul(deltaTime / 1000f);
 
-                if (positionToTarget.getLen() >= d.getLen()) {
+                if (positionToTarget.getLength() >= d.getLength()) {
                     Vec3 position1 = new Vec3(position).add(d);
                     writable.putComponent0(entityId, new Position(position1));
                 } else {

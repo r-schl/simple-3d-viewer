@@ -81,13 +81,13 @@ class Main {
         thirdPersonViewSystem.set(store, eventDispatcher);
         thirdPersonViewSystem.start();
 
-        OscillationSystem blockMoveSystem = new OscillationSystem();
+       OscillationSystem blockMoveSystem = new OscillationSystem();
         blockMoveSystem.set(store, eventDispatcher);
         blockMoveSystem.start();
 
         BlockSpawnSystem blockSpawnSystem = new BlockSpawnSystem();
         blockSpawnSystem.set(store, eventDispatcher);
-        blockSpawnSystem.start();
+        blockSpawnSystem.start(); 
 
         VelocitySystem velocitySystem = new VelocitySystem();
         velocitySystem.set(store, eventDispatcher);

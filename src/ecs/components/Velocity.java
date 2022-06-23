@@ -22,7 +22,7 @@ public class Velocity extends Component {
     }
 
     public float getSpeed() {
-        return this.v.getLen();
+        return this.v.getLength();
     }
 
 }

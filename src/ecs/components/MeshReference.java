@@ -96,7 +96,7 @@ public class MeshReference extends Component {
             Vec3 v2 = new Vec3(pos2).sub(pos0);
 
             Vec3 normal = new Vec3(v1).cross(v2);
-            if (normal.getLen() != 0)
+            if (normal.getLength() != 0)
                 normal.normalize();
 
             normals[i0 * 3] += normal.x;
